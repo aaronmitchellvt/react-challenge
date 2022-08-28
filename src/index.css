@@ -11,3 +11,35 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.center-text{
+  text-align: center;
+}
+
+.center {
+  margin-bottom: 15px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.top-margin {
+  margin-top: 30px;
+}
+
+.center-btn {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.inline-form{
+  display: flex;
+}
+
+.margin-top-bottom {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
