@@ -20,7 +20,7 @@ function MovieShowPage(props) {
 
   const getMovieData = async () => {
     const response = await axios.get(
-      `http://www.omdbapi.com/?i=${id}&apikey=<your_API_key`
+      `http://www.omdbapi.com/?i=${id}&apikey=<your_API_key>`
     );
     setMovieData({
       title: response.data.Title,
