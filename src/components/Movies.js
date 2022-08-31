@@ -1,22 +1,43 @@
-import { Button, Form, Row, Col, Container } from "react-bootstrap";
+import { Button, Form, Row, Col, Container, Card } from "react-bootstrap";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import MovieTile from "./MovieTile";
+import { useNavigate } from "react-router-dom";
+import { FaArrowRight, FaTrash } from "react-icons/fa";
 
 function Movies() {
+  const navigate = useNavigate();
+  const getFavoriteMovies = () => {
+    const storedValues = localStorage.getItem("movie-favorites");
+    if (!storedValues) return [];
+    return JSON.parse(storedValues);
+  };
+
   const [movieTitle, setMovieTitle] = useState("");
   const [movies, setMovies] = useState([]);
-  const [favoriteMovies, setFavoriteMovies] = useState([]);
+  const [favoriteMovies, setFavoriteMovies] = useState(getFavoriteMovies);
 
   const getMovieData = async () => {
     const validTitle = movieTitle.split(" ").join("+");
     console.log("Valid title: ", validTitle);
-    const url = `http://www.omdbapi.com/?s=${validTitle}&type=movie&apikey=<your_API_Key>`;
+    const url = `http://www.omdbapi.com/?s=${validTitle}&type=movie&apikey=<your api key>`;
     const response = await axios.get(url);
     const moviesData = response.data.Search;
 
     const movieTiles = moviesData.map((movie) => {
-      return <MovieTile addToFavorites={addToFavorites} movie={movie} />;
+      let isFavorited = false;
+      if (favoriteMovies.some((favMovie) => favMovie.id === movie.imdbID)) {
+        isFavorited = true;
+      }
+      return (
+        <Col col sm={12} md={6} lg={4}>
+          <MovieTile
+            addToFavorites={addToFavorites}
+            movie={movie}
+            isFavorited={isFavorited}
+          />
+        </Col>
+      );
     });
     setMovies([...movies, movieTiles]);
     console.log("Movies", movies);
@@ -28,25 +49,23 @@ function Movies() {
     setMovieTitle("");
   };
 
+  const onNavigate = (movieId) => {
+    navigate(`/movies/${movieId}`);
+  };
+
   const addToFavorites = (newFavorite) => {
-    console.log("Add to fav called");
-    const favFromStorage = JSON.parse(localStorage.getItem("my-favorites"));
-    favFromStorage.push(JSON.stringify(newFavorite));
+    console.log("New favorite: ", newFavorite);
+    setFavoriteMovies((favoriteMovies) => favoriteMovies.concat(newFavorite));
+  };
+
+  const deleteFavMovie = (movieId) => {
+    setFavoriteMovies(favoriteMovies.filter((movie) => movieId !== movie.id));
+    localStorage.setItem("movie-favorites", JSON.stringify(favoriteMovies));
   };
 
   useEffect(() => {
-    if (favoriteMovies.length) {
-      const favMovies = JSON.parse(localStorage.getItem("my-favorites"));
-      if (favMovies) {
-        setFavoriteMovies(favMovies);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    console.log(movies);
-    localStorage.setItem("my-favorites", JSON.stringify(favoriteMovies));
-  });
+    localStorage.setItem("movie-favorites", JSON.stringify(favoriteMovies));
+  }, [favoriteMovies]);
 
   return (
     <div>
@@ -57,7 +76,7 @@ function Movies() {
             <Form.Label>Enter a movie</Form.Label>
             <Form.Control
               type="text"
-              placeholder=""
+              placeholder="Guardians of the Galaxy"
               value={movieTitle}
               onChange={(e) => {
                 setMovieTitle(e.target.value);
@@ -74,24 +93,41 @@ function Movies() {
 
       <section>
         <Container>
-          <Row>
-            {movies.map((tile, i) => (
-              <Col col sm={12} md={6} lg={4} key={i}>
-                {tile}
-              </Col>
-            ))}
-          </Row>
+          <Row>{movies}</Row>
         </Container>
       </section>
 
       {favoriteMovies.length > 0 ? (
-        <div>
-          {favoriteMovies.map((fav) => (
-            <h3>{fav.title}</h3>
-          ))}
-        </div>
+        <Container>
+          <h2 className="center-text">Favorite Movies</h2>
+          <Row>
+            {favoriteMovies.map((fav) => (
+              <Col col sm={12} md={6} lg={4}>
+                <Card className="margin-top-bottom">
+                  <Card.Body>
+                    <Card.Title>{fav.title}</Card.Title>
+                    <Card.Link
+                      onClick={() => {
+                        deleteFavMovie(fav.id);
+                      }}
+                    >
+                      <FaTrash />
+                    </Card.Link>
+                    <Card.Link
+                      onClick={() => {
+                        onNavigate(fav.id);
+                      }}
+                    >
+                      <FaArrowRight />
+                    </Card.Link>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </Container>
       ) : (
-        <h3 className="center-text">No Favorite Movies</h3>
+        <h4 className="center-text">No Favorite Movies</h4>
       )}
     </div>
   );

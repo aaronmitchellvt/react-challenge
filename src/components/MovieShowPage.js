@@ -20,7 +20,7 @@ function MovieShowPage(props) {
 
   const getMovieData = async () => {
     const response = await axios.get(
-      `http://www.omdbapi.com/?i=${id}&apikey=<your_API_key>`
+      `http://www.omdbapi.com/?i=${id}&apikey=<your api key>`
     );
     setMovieData({
       title: response.data.Title,
@@ -43,7 +43,7 @@ function MovieShowPage(props) {
     <div className="top-margin">
       <Container>
         <Row>
-          <Col>
+          <Col sm={12} md={6} lg={6}>
             <h1 className="center-text">{movieData.title}</h1>
             <img className="center" src={movieData.poster} alt="movie poster" />
             <p className="center-text">
@@ -57,7 +57,7 @@ function MovieShowPage(props) {
             </p>
           </Col>
 
-          <Col>
+          <Col sm={12} md={6} lg={6}>
             <h1 className="center-text">Plot</h1>
             <p className="center-text"> {movieData.plot}</p>
             <hr />

@@ -1,13 +1,26 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {Card, Button} from 'react-bootstrap'
-import { Link } from "react-router-dom"
+import { FaRegHeart } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-function MovieTile({ movie, addToFavorites }) {
+function MovieTile({ movie, addToFavorites, isFavorited }) {
+  const navigate = useNavigate()
+  const [inFavs, setInFavs] = useState(isFavorited)
+
+  const onNavigate = () => {
+    navigate(`/movies/${movie.imdbID}`)
+  }
 
   const thisMovie = {
     id: movie.imdbID,
     title: movie.Title
   }
+
+  const onFavorite = () => {
+    addToFavorites(thisMovie)
+    setInFavs(!inFavs)
+  }
+  
   return (
     <div className="margin-top-bottom">
     <Card style={{ width: "18rem" }}>
@@ -15,8 +28,8 @@ function MovieTile({ movie, addToFavorites }) {
     <Card.Body>
       <Card.Title>{movie.Title}</Card.Title>
       <Card.Subtitle className="mb-2 text-muted">{movie.Year}</Card.Subtitle>
-      <Button variant="light"><Link to ={`/movies/${movie.imdbID}`}>More Info</Link></Button>
-      <Button onClick={() => addToFavorites(thisMovie)} variant="light">Add To Favorites</Button>
+      <Button variant="primary" onClick={onNavigate}>More Info</Button>{ ' ' }
+      {!inFavs && (<Card.Link className="margin-left" onClick={onFavorite}> <FaRegHeart/> </Card.Link>)}
     </Card.Body>
   </Card>
   </div>
